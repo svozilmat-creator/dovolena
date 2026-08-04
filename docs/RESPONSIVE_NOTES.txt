@@ -1,0 +1,18 @@
+TRIPLAB RESPONSIVE FIX
+
+1. Rozbalte původní projekt.
+2. Zkopírujte apply_responsive_fix.py do kořene projektu vedle index.html.
+3. Ve stejné složce spusťte:
+   python apply_responsive_fix.py
+4. Nahrajte celý obsah složky na GitHub, včetně destinations-data.js.
+
+Oprava:
+- umožní otevření index.html dvojklikem;
+- zachová načítání destinations.json na GitHub Pages;
+- přidá záložní data;
+- upraví desktop, tablet i mobil;
+- doplní vysouvací mobilní filtry;
+- opraví 100vh/dynamickou výšku v Safari;
+- respektuje safe-area iPhonu;
+- zvětší dotykové plochy;
+- upraví detail, porovnání a mapu na mobilu.

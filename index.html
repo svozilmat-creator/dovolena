@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>31 destinací na 5 dní | Srovnávač</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2321; --paper:#f4efe4; --paper2:#ece4d2;
+    --teal:#1e4a44; --teal-l:#2f6b62; --ochre:#c07f2b; --sea:#2f7896;
+    --coral:#c65b42; --plum:#7a4a6b; --grey:#5c5346; --line:#d8cdb2;
+    --good:#2e5a1e; --goodbg:#e7efe4; --warn:#8a5a15; --warnbg:#f3e6cd;
+    --bad:#8a3d24; --badbg:#f4e3dd;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:720px;margin:0 auto;padding:0 0 60px;}
+
+  header{padding:32px 20px 24px;background:linear-gradient(180deg,var(--teal) 0%,var(--teal-l) 100%);color:var(--paper);border-bottom:4px solid var(--ochre);}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.75;margin-bottom:8px;}
+  h1{font-family:'Fraunces',serif;font-weight:600;font-size:24px;line-height:1.2;margin:0 0 10px;}
+  header p{margin:0;font-size:13.5px;line-height:1.55;opacity:.92;max-width:54ch;}
+  .weights{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px;}
+  .wchip{font-family:'JetBrains Mono',monospace;font-size:10px;background:rgba(244,239,228,.12);border:1px solid rgba(244,239,228,.25);padding:4px 9px;border-radius:20px;}
+
+  .notice{margin:16px 20px 0;background:#3a2f28;color:#f3e6cd;border-left:3px solid var(--ochre);border-radius:2px;padding:12px 14px;font-size:11.5px;line-height:1.55;}
+  .notice b{color:#fff;}
+
+  .budgetbar{margin:14px 20px 0;background:var(--ink);color:var(--paper);border-radius:2px;padding:12px 16px;}
+  .budgetbar .b1{font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.7;display:block;margin-bottom:2px;}
+  .budgetbar .b2{font-family:'Fraunces',serif;font-weight:700;font-size:17px;}
+  .budgetbar .b3{font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.65;margin-top:4px;}
+
+  .panel{margin:14px 20px 0;background:var(--paper2);border:1px solid var(--line);border-radius:2px;padding:14px 16px;}
+  .panel h2{font-family:'Fraunces',serif;font-size:14px;font-weight:600;margin:0 0 10px;display:flex;align-items:center;gap:8px;}
+  .panel h2::before{content:"";width:7px;height:7px;background:var(--coral);border-radius:50%;display:inline-block;}
+  .panel + .panel{margin-top:8px;}
+
+  .dbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .dbtn{background:var(--paper);border:1px solid var(--line);border-radius:2px;padding:9px;text-align:left;cursor:pointer;font-family:'Inter',sans-serif;}
+  .dbtn.active{background:var(--teal);border-color:var(--teal);}
+  .dbtn.active .dq{color:rgba(244,239,228,.7);}
+  .dbtn.active .da{color:var(--paper);}
+  .dq{display:block;font-size:10px;color:#8a7f63;margin-bottom:2px;}
+  .da{display:block;font-family:'Fraunces',serif;font-weight:600;font-size:12.5px;color:var(--ink);}
+
+  .chiprow{display:flex;gap:6px;flex-wrap:wrap;}
+  .chiprow + .chiprow{margin-top:8px;}
+  .chiplabel{font-family:'JetBrains Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:#8a7f63;width:100%;margin-bottom:2px;}
+  .chip{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.02em;border:1px solid var(--line);background:var(--paper);padding:5px 10px;border-radius:20px;cursor:pointer;color:var(--ink);}
+  .chip.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+
+  .sortpanel{display:flex;flex-direction:column;gap:8px;}
+  .sortrow-item{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#6b6250;}
+  .sortrow-item select{flex:1;font-family:'JetBrains Mono',monospace;font-size:10.5px;background:var(--paper);border:1px solid var(--line);padding:6px 8px;border-radius:2px;color:var(--ink);}
+
+  .count{margin:12px 20px 0;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#a89a72;}
+
+  .cards{margin:12px 20px 0;display:flex;flex-direction:column;gap:10px;}
+  .card{background:#fffdf8;border:1px solid var(--line);border-radius:3px;padding:16px;position:relative;}
+  .card.overbudget{opacity:.72;}
+  .icons{display:flex;gap:6px;margin-bottom:8px;}
+  .icons svg{width:22px;height:22px;}
+  .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px;}
+  .rank{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#a89a72;}
+  .name{font-family:'Fraunces',serif;font-weight:700;font-size:18px;margin:2px 0 0;}
+  .sub{font-size:12.5px;color:#6b6250;margin-top:2px;}
+  .verdict{font-size:9.5px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.04em;padding:4px 8px;border-radius:20px;white-space:nowrap;margin-top:3px;}
+  .v-top{background:#1e4a44;color:#f4efe4;}
+  .v-good{background:#2f7896;color:#f4efe4;}
+  .v-caveat{background:#c07f2b;color:#fff;}
+  .v-hot{background:#c65b42;color:#fff;}
+  .v-overbudget{background:#5c5346;color:#f4efe4;}
+
+  .desc{font-size:13px;line-height:1.5;margin:8px 0 12px;color:#3c362c;}
+
+  .gauges{display:grid;grid-template-columns:1fr 1fr;gap:9px 12px;margin-bottom:12px;}
+  .gauge-label{font-family:'JetBrains Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:#8a7f63;margin-bottom:5px;}
+  .dots{display:flex;gap:3px;}
+  .dot{width:100%;height:6px;background:var(--paper2);border-radius:1px;}
+  .dot.on-act{background:var(--teal);}
+  .dot.on-heat{background:var(--coral);}
+  .dot.on-crowd{background:var(--sea);}
+  .dot.on-food{background:var(--plum);}
+
+  .budgetline{background:var(--paper2);border:1px solid var(--line);border-radius:2px;padding:9px 10px;margin-bottom:10px;}
+  .budgetline-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .amount{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;}
+  .breakdown{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#8a7f63;margin-top:4px;}
+  .fitpill{font-family:'JetBrains Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.03em;padding:3px 8px;border-radius:20px;white-space:nowrap;}
+  .fit-ok{background:var(--goodbg);color:var(--good);}
+  .fit-tight{background:var(--warnbg);color:var(--warn);}
+  .fit-over{background:var(--badbg);color:var(--bad);}
+
+  .meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+  .meta-badge{font-family:'JetBrains Mono',monospace;font-size:10px;background:var(--paper2);border:1px solid var(--line);padding:4px 9px;border-radius:20px;color:#4a4438;}
+  .meta-badge.drive{background:#e4ece9;border-color:#b7cec5;color:#1e4a44;}
+
+  .tips{margin:0 0 12px;padding:0;list-style:none;}
+  .tips li{font-size:12.5px;line-height:1.5;color:#3c362c;padding:5px 0 5px 16px;position:relative;border-top:1px dashed var(--line);}
+  .tips li:first-child{border-top:none;}
+  .tips li::before{content:"→";position:absolute;left:0;color:var(--ochre);font-family:'JetBrains Mono',monospace;font-size:11px;}
+
+  .tags{display:flex;gap:5px;flex-wrap:wrap;}
+  .tag{font-family:'JetBrains Mono',monospace;font-size:10px;background:var(--paper2);border:1px solid var(--line);padding:3px 8px;border-radius:20px;color:#4a4438;}
+
+  footer{margin:26px 20px 0;font-size:11.5px;color:#8a7f63;line-height:1.65;border-top:1px solid var(--line);padding-top:14px;}
+  footer b{color:#4a4438;}
+
+  @media(min-width:600px){.dbtns{grid-template-columns:repeat(4,1fr);} .gauges{grid-template-columns:repeat(4,1fr);}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">4–5 dní · srpen · 2 osoby · z Olomouce</div>
+    <h1>31 míst na 5 dní — přepočítáno na reálný rozpočet</h1>
+    <p>Rozpočet teď počítá s apartmánem s kuchyňkou, vlastním vařením 1–2× denně, jedním restauračním jídlem za pobyt, střední cenou letenek a reálným benzínem + dálničními poplatky u aut.</p>
+    <div class="weights">
+      <span class="wchip">byt s kuchyňkou</span>
+      <span class="wchip">vaření 1–2×/den</span>
+      <span class="wchip">1× restaurace</span>
+      <span class="wchip">střední cena letenek</span>
+      <span class="wchip">reálný benzín</span>
+    </div>
+  </header>
+
+  <div class="notice">
+    <b>K obrázkům:</b> nemám nástroj na ověřené fotky konkrétních míst, takže místo nich mají karty malé ikonky podle toho, co tam je (hory/moře/město/voda/kolo) — orientační, ne fotky. Pro užší výběr ti klidně otevřu interaktivní mapu se skutečnými místy.<br><br>
+    <b>K počasí:</b> škála „vedro" jsou dlouhodobé srpnové průměry, ne živá předpověď — tu si ověř na windy.com/ventusky.com blíž k odletu.
+  </div>
+
+  <div class="budgetbar">
+    <span class="b1">Rozpočet na cestu</span>
+    <span class="b2">22 000 Kč / 2 osoby / 5 dní</span>
+    <span class="b3">byt (4 noci) + jídlo (nákup + 1× restaurace) + doprava</span>
+  </div>
+
+  <div class="panel">
+    <h2>Rychlé rozhodnutí</h2>
+    <div class="dbtns">
+      <button class="dbtn" data-filter="jidlo"><span class="dq">Chci</span><span class="da">nejlepší jídlo</span></button>
+      <button class="dbtn" data-filter="auto"><span class="dq">Chci</span><span class="da">jet autem (do 10 h)</span></button>
+      <button class="dbtn" data-filter="original"><span class="dq">Chci</span><span class="da">nejmíň turistů</span></button>
+      <button class="dbtn" data-filter="mestohory"><span class="dq">Chci</span><span class="da">město + hory</span></button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Filtry (dají se kombinovat)</h2>
+    <div class="chiprow" id="tagFilters">
+      <span class="chiplabel">typ</span>
+      <div class="chip active" data-tag="vse">vše</div>
+      <div class="chip" data-tag="moře">moře</div>
+      <div class="chip" data-tag="hory">hory</div>
+      <div class="chip" data-tag="voda">jezero/řeka</div>
+      <div class="chip" data-tag="mesto">město</div>
+      <div class="chip" data-tag="cyklo">cyklo</div>
+    </div>
+    <div class="chiprow" id="budgetFilters">
+      <span class="chiplabel">rozpočet</span>
+      <div class="chip active" data-budget="vse">vše</div>
+      <div class="chip" data-budget="10">do 10 000 Kč</div>
+      <div class="chip" data-budget="15">do 15 000 Kč</div>
+      <div class="chip" data-budget="22">do 22 000 Kč</div>
+    </div>
+    <div class="chiprow" id="heatFilters">
+      <span class="chiplabel">vedro (srpen)</span>
+      <div class="chip active" data-heat="vse">vše</div>
+      <div class="chip" data-heat="chlad">chladno (≤2)</div>
+      <div class="chip" data-heat="mirne">mírné (3)</div>
+      <div class="chip" data-heat="horko">horko (4–5)</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Řazení (2 kritéria najednou)</h2>
+    <div class="sortpanel">
+      <div class="sortrow-item">
+        <span>primárně</span>
+        <select id="sortPrimary">
+          <option value="rank">doporučení</option>
+          <option value="cena">cena (nejlevnější)</option>
+          <option value="teplo">vedro (nejchladnější)</option>
+          <option value="aktivita">aktivita (nejvíc)</option>
+          <option value="gastro">gastronomie (nejlepší)</option>
+          <option value="davy">turisté (nejklidnější)</option>
+          <option value="drive">auto z Olomouce (nejblíž)</option>
+        </select>
+      </div>
+      <div class="sortrow-item">
+        <span>pak podle</span>
+        <select id="sortSecondary">
+          <option value="none">—</option>
+          <option value="cena">cena</option>
+          <option value="teplo">vedro</option>
+          <option value="aktivita">aktivita</option>
+          <option value="gastro">gastronomie</option>
+          <option value="davy">turisté</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="count" id="count"></div>
+
+  <div class="cards" id="cards"></div>
+
+  <footer>
+    <b>Metodika rozpočtu:</b> byt s kuchyňkou na 4 noci (podle cenové hladiny země) + nákup na vaření 1–2× denně + jedno restaurační jídlo za pobyt + doprava (benzín a dálniční poplatky při autě do 10 h, jinak letenka za střední tržní cenu pro 2 osoby) + drobná místní doprava. Jsou to modelové odhady z obecné znalosti cenových hladin, ne živá data z rezervačních systémů.<br><br>
+    <b>Žebříček:</b> nejdřív rozděleno na vejde se do 22k / na hraně / nad rozpočtem, uvnitř skupiny řazeno podle 2×aktivita − 2×vedro − 1,5×turisté + 1,5×gastronomie + MHD + bonus za přímý let.<br><br>
+    <b>Gastronomie</b> = obecně sdílená reputace kuchyně dané země/regionu, ne subjektivní vkus.<br><br>
+    Než nakoupíš letenky nebo ubytování, ověř si aktuální ceny na Skyscanneru/Kiwi, Bookingu a cenu paliva na cestu v navigaci.
+  </footer>
+
+</div>
+
+<script>
+const data = [
+{rank:1,name:"Innsbruck",country:"Rakousko",sub:"Alpy přímo ve městě",aktivita:5,teplo:2,davy:3,gastro:3,mhd:"Skvělá",drive:6,flight:"no",flightText:"bez přímého letu",transport:"auto ~2 800 Kč (benzín+dálniční)",budgetSubtotal:11350,budget:14000,fit:"ok",tags:["hory","mesto"],verdict:"v-top",verdictText:"TOP · aktivita, MHD, dostupné autem",desc:"Lanovka z centra rovnou do Alp, s vařením a autem vychází levně.",tips:["Lanovka Nordkette přímo z centra na hřeben Alp","Kolo podél řeky Inn do vesnice Hall in Tirol","Alpská zoo s výhledem na město","Treking v údolí Stubaital, ledovec i v srpnu"]},
+{rank:2,name:"Trento / Dolomity",country:"Itálie",sub:"Dolomity bez cortinského davu",aktivita:5,teplo:2,davy:3,gastro:4,mhd:"Průměrná",drive:7,flight:"no",flightText:"bez přímého letu",transport:"auto ~3 200 Kč (benzín+dálniční)",budgetSubtotal:11350,budget:14500,fit:"ok",tags:["hory","cyklo"],verdict:"v-top",verdictText:"hory, jídlo, auto do 10 h",desc:"Dolomity bez cortinského davu, kuchyně na pomezí Itálie a Rakouska.",tips:["Lanovka na Monte Bondone přímo z Trenta, procházka po hřebeni","Vlak do Bolzana, ochutnávka jihotyrolských vín a speck","Treking v Brenta Dolomites nebo kolem jezera Lago di Molveno","Aperitivo na Piazza Duomo místo turistické večeře"]},
+{rank:3,name:"Bregenz",country:"Rakousko",sub:"Alpy padají rovnou do Bodenského jezera",aktivita:4,teplo:2,davy:2,gastro:3,mhd:"Dobrá",drive:7,flight:"no",flightText:"bez přímého letu",transport:"auto ~3 200 Kč (benzín+dálniční)",budgetSubtotal:11350,budget:14500,fit:"ok",tags:["hory","voda"],verdict:"v-top",verdictText:"jezero + hory, auto do 10 h",desc:"Alpy padají rovnou do jezera, cyklostezka obkrouží celé pobřeží.",tips:["Lanovka Pfänder nad jezerem, výhled na tři země naráz","Koupání a paddleboarding přímo v jezeře pod městem","Kolo po cyklostezce kolem celého Bodenského jezera","Výlet do údolí Bregenzerwald za sýrem a horskými loukami"]},
+{rank:4,name:"Bergamo",country:"Itálie",sub:"tišší dvojče Milána, vlastní staré město",aktivita:3,teplo:3,davy:2,gastro:4,mhd:"Dobrá",drive:7,flight:"yes",flightText:"přímý let (letiště Bergamo)",transport:"auto ~3 200 Kč (nebo let ~4 500 Kč)",budgetSubtotal:11350,budget:14500,fit:"ok",tags:["hory","mesto"],verdict:"v-top",verdictText:"tišší alternativa Milána",desc:"Tišší dvojče Milána s vlastním starým městem na kopci.",tips:["Funicular do Città Alta, procházka po benátských hradbách","Vlak na jezero Iseo, výrazně méně turistické než Como","Kolo podél řeky Serio nebo výlet do Val Seriana","Aperitivo na Piazza Vecchia, mimo hlavní turistický proud"]},
+{rank:5,name:"Milán",country:"Itálie",sub:"+ Como a Bergamo, město i jezera v jednom",aktivita:3,teplo:3,davy:4,gastro:5,mhd:"Skvělá",drive:8,flight:"yes",flightText:"přímý let",transport:"auto ~3 600 Kč (nebo let ~4 500 Kč)",budgetSubtotal:11350,budget:15000,fit:"ok",tags:["hory","mesto"],verdict:"v-top",verdictText:"nejvyváženější balík",desc:"Nejvyváženější balík: jídlo, MHD, jezera na skok vlakem.",tips:["Vlak na jezero Como nebo Lago di Garda, procházka po promenádě","Navigli district večer, kanály s lokálním street foodem","Výlet do Bergama nebo Monzy (park + okruh F1)","Den v galerii Brera, klidnější než centrum"]},
+{rank:6,name:"Slovinsko",country:"",sub:"Julské Alpy, jezera, čistě příroda",aktivita:5,teplo:2,davy:3,gastro:3,mhd:"Slabá bez auta",drive:6,flight:"no",flightText:"bez přímého letu",transport:"auto ~2 700 Kč (benzín+dálniční)",budgetSubtotal:8150,budget:11000,fit:"ok",tags:["hory","voda"],verdict:"v-top",verdictText:"nejvíc čisté hory, levné",desc:"Nejvíc čisté hory a řeky bez kompromisu s městem, a levně.",tips:["Treking kolem jezera Bohinj, výrazně méně lidí než u Bledu","Rafting nebo koupání v řece Soči, tyrkysová voda","Vintgar Gorge, dřevěné lávky přímo nad řekou","Výlet do Lublaně na řemeslné pivo a farmářský trh"]},
+{rank:7,name:"Graz",country:"Rakousko",sub:"menší rakouské město s gastro scénou",aktivita:3,teplo:3,davy:2,gastro:4,mhd:"Dobrá",drive:4,flight:"no",flightText:"bez přímého letu (nebo přes Vídeň)",transport:"auto ~1 900 Kč (benzín+dálniční)",budgetSubtotal:8150,budget:10000,fit:"ok",tags:["hory","mesto","voda"],verdict:"v-good",verdictText:"klidné, dobré jídlo, blízko",desc:"Menší, klidnější rakouské město s překvapivě dobrou gastro scénou.",tips:["Výstup na Schlossberg, výhled na město zdarma","Kajak nebo paddleboard na řece Muře přímo ve městě","Kaiser-Josef-Markt, farmářský trh s lokálními specialitami","Výlet vlakem do vinařské oblasti Südsteiermark"]},
+{rank:8,name:"Černá Hora",country:"",sub:"hory přímo nad mořem, Kotorská zátoka",aktivita:5,teplo:3,davy:3,gastro:3,mhd:"Slabá bez auta",drive:null,flight:"yes",flightText:"přímý let (sezónní)",transport:"let ~5 500 Kč (2 osoby, střední cena)",budgetSubtotal:11350,budget:17000,fit:"ok",tags:["hory","moře"],verdict:"v-good",verdictText:"hory + moře v jednom",desc:"Hory padají přímo do moře, nejkoncentrovanější kombinace v žebříčku.",tips:["Treking na pevnost nad Kotorem, výhled na celou zátoku","Turistika v národním parku Lovćen","Koupání pod horami, kajak přímo v Kotorské zátoce","Výlet do kaňonu Tara, druhého nejhlubšího na světě"]},
+{rank:9,name:"Bamberg",country:"Německo",sub:"pivní UNESCO město, kopce za rohem",aktivita:3,teplo:3,davy:2,gastro:4,mhd:"Průměrná",drive:5,flight:"no",flightText:"bez přímého letu",transport:"auto ~2 100 Kč (benzín+dálniční)",budgetSubtotal:8150,budget:10000,fit:"ok",tags:["mesto","voda"],verdict:"v-good",verdictText:"pivní UNESCO, auto do 10 h",desc:"Pivní kultura UNESCO úrovně, kopce Franského Švýcarska za rohem.",tips:["Procházka mezi pivovary, ochutnávka kouřového Rauchbieru","Kolo podél řeky Regnitz do vesnice Bug","Výlet do Franského Švýcarska, skalní města a jeskyně","Večer v malé pivnici mimo hlavní náměstí"]},
+{rank:10,name:"Sarajevo",country:"Bosna a Hercegovina",sub:"hory obklopující město, kávová kultura",aktivita:4,teplo:4,davy:2,gastro:3,mhd:"Průměrná",drive:10,flight:"partial",flightText:"let s přestupem",transport:"auto ~4 500 Kč (10 h) nebo let ~5 500 Kč",budgetSubtotal:6150,budget:10500,fit:"ok",tags:["hory","mesto"],verdict:"v-good",verdictText:"originální, levné, hory",desc:"Hory obklopující město, kávová kultura, pořád levné a klidné.",tips:["Lanovka na horu Trebević, bobová dráha z olympiády 1984","Procházka Baščaršijí, kávová kultura a řemeslné dílny","Treking v národním parku Bjelašnica nebo Igman","Výlet k prameni řeky Bosny, Vrelo Bosne"]},
+{rank:11,name:"Sofia",country:"Bulharsko",sub:"hora Vitoša dostupná metrem z centra",aktivita:4,teplo:4,davy:2,gastro:2,mhd:"Dobrá (metro)",drive:null,flight:"yes",flightText:"přímý let z Prahy",transport:"let ~4 000 Kč (2 osoby, střední cena)",budgetSubtotal:6150,budget:10000,fit:"ok",tags:["hory","mesto"],verdict:"v-good",verdictText:"levné, hora metrem",desc:"Hora dostupná metrem přímo z centra velkoměsta.",tips:["Lanovka a stezky na Vitošu přímo z centra","Boyanský kostel, UNESCO památka pod horou","Kavárenská scéna kolem čtvrti Krasno Selo","Treking na Cherni Vrah, nejvyšší vrchol Vitoše"]},
+{rank:12,name:"Girona",country:"Španělsko",sub:"kolo, Costa Brava, blízko Barceloně",aktivita:4,teplo:5,davy:3,gastro:5,mhd:"Průměrná",drive:null,flight:"yes",flightText:"přímý let (Barcelona blízko)",transport:"let ~5 000 Kč (2 osoby, střední cena)",budgetSubtotal:14650,budget:19500,fit:"ok",tags:["hory","moře","cyklo"],verdict:"v-hot",verdictText:"gastro špička, ale horko",desc:"Katalánská gastro špička s cyklostezkami do hor i k moři.",tips:["Procházka podél barevných domů řeky Onyar, klidnější ráno","Kolo po Via Verde, staré železniční trati do hor","Costa Brava kolem Begur, méně turistické zátoky","Farmářský trh v historickém centru"]},
+{rank:13,name:"Porto",country:"Portugalsko",sub:"řeka Douro, kopce, portské",aktivita:3,teplo:3,davy:4,gastro:4,mhd:"Dobrá",drive:null,flight:"yes",flightText:"přímý let (sezónní)",transport:"let ~6 500 Kč (2 osoby, střední cena)",budgetSubtotal:11350,budget:18000,fit:"ok",tags:["mesto","voda"],verdict:"v-good",verdictText:"dobré jídlo, atlantický chlad",desc:"Atlantický chlad, portské víno, dobrá kuchyně.",tips:["Vlak podél řeky Douro do vinařských teras","Přívoz do Vila Nova de Gaia na ochutnávku portského","Pobřežní stezka podél oceánu na sever od centra","Livraria Lello brzy ráno, mimo turistickou špičku"]},
+{rank:14,name:"Salzburg",country:"Rakousko",sub:"Alpy a jezera Salzkammergutu",aktivita:4,teplo:3,davy:4,gastro:3,mhd:"Dobrá",drive:4,flight:"no",flightText:"bez přímého letu",transport:"auto ~1 800 Kč (benzín+dálniční)",budgetSubtotal:11350,budget:13000,fit:"ok",tags:["hory","mesto","voda"],verdict:"v-good",verdictText:"Alpy i jezera, auto do 10 h",desc:"Alpské město s jezery Salzkammergutu, dostupné i autem za den.",tips:["Lanovka na Untersberg, výhled na celé Solnohradsko","Salzkammergut jezera Fuschlsee nebo Wolfgangsee, mimo Hallstatt","Zahrada Mirabell brzy ráno, bez davů","Kajak nebo koupání v řece Salzach"]},
+{rank:15,name:"Kraków + Zakopane",country:"Polsko",sub:"město + Tatry hodinu autobusem",aktivita:4,teplo:3,davy:4,gastro:2,mhd:"Dobrá",drive:3,flight:"yes",flightText:"přímý let / krátká cesta autem",transport:"auto ~1 300 Kč (nebo let ~3 500 Kč)",budgetSubtotal:6150,budget:7500,fit:"ok",tags:["hory","mesto"],verdict:"v-good",verdictText:"nejlevnější balík",desc:"Nejlevnější balík v žebříčku s Tatrami na skok autobusem.",tips:["Treking v Tatrách, Morskie Oko brzy ráno kvůli davům","Kazimierz, bývalá židovská čtvrť s kavárnami","Kolo podél řeky Visly, klidnější než Staré Město","Termální lázně v Zakopaném po celodenním treku"]},
+{rank:16,name:"Cluj-Napoca",country:"Rumunsko",sub:"mladé univerzitní město, Karpaty blízko",aktivita:3,teplo:4,davy:2,gastro:3,mhd:"Průměrná",drive:null,flight:"yes",flightText:"přímý let",transport:"let ~4 500 Kč (2 osoby, střední cena)",budgetSubtotal:6150,budget:10500,fit:"ok",tags:["hory","mesto"],verdict:"v-good",verdictText:"originální, Karpaty blízko",desc:"Mladé univerzitní město, Karpaty i jeskyně kousek od centra.",tips:["Treking v Apuseni horách, jeskyně a vodopády","Botanická zahrada, procházka podél řeky Someș","Kávová a craft beer scéna, mladé univerzitní město","Solný důl Turda, unikátní podzemní atrakce"]},
+{rank:17,name:"Passau",country:"Německo",sub:"soutok tří řek, Bavorský les za rohem",aktivita:3,teplo:3,davy:3,gastro:3,mhd:"Průměrná",drive:3,flight:"no",flightText:"bez letu, jen auto/vlak",transport:"auto ~1 200 Kč (benzín+dálniční)",budgetSubtotal:8150,budget:9500,fit:"ok",tags:["voda","hory"],verdict:"v-good",verdictText:"tři řeky, nejblíž autem",desc:"Tři řeky, kajak, Bavorský les za rohem.",tips:["Kajak po soutoku tří řek — Dunaje, Innu a Ilzu","Kolo po cyklostezce podél Dunaje do Rakouska","Výhled na město z pevnosti Veste Oberhaus","Výlet do Bavorského lesa, národní park kousek od města"]},
+{rank:18,name:"Pula / Istrie",country:"Chorvatsko",sub:"lanýže, moře, méně turistické Chorvatsko",aktivita:3,teplo:5,davy:3,gastro:4,mhd:"Průměrná",drive:7,flight:"yes",flightText:"přímý let / cesta autem",transport:"auto ~3 200 Kč (nebo let ~5 000 Kč)",budgetSubtotal:14650,budget:18000,fit:"ok",tags:["moře","mesto"],verdict:"v-hot",verdictText:"lanýže + moře, tepleji",desc:"Lanýže, moře, méně turistické než jih Chorvatska.",tips:["Národní park Brijuni nebo Kamenjak, treking a koupání","Ochutnávka lanýžů ve vnitrozemí (Motovun, Grožnjan)","Koupání v zátokách mimo hlavní pláže","Amfiteátr a večerní procházka starým městem"]},
+{rank:19,name:"Regensburg",country:"Německo",sub:"klidnější UNESCO město podél Dunaje",aktivita:2,teplo:3,davy:3,gastro:3,mhd:"Průměrná",drive:4.5,flight:"no",flightText:"bez letu, jen auto/vlak",transport:"auto ~2 000 Kč (benzín+dálniční)",budgetSubtotal:8150,budget:10000,fit:"ok",tags:["mesto","voda"],verdict:"v-good",verdictText:"klidné UNESCO, auto do 10 h",desc:"Klidnější UNESCO staré město podél Dunaje bez davů jihu Německa.",tips:["Nejstarší kamenný most v Německu nad Dunajem","Kolo podél Dunaje k ostrovu Walhalla","Staré město UNESCO bez typických jižoněmeckých davů","Loď do kláštera Weltenburg přes soutěsku Dunaje"]},
+{rank:20,name:"Rovinj",country:"Chorvatsko",sub:"nejfotogeničtější istrijské městečko",aktivita:3,teplo:5,davy:3,gastro:4,mhd:"Slabá",drive:7,flight:"partial",flightText:"let přes Pulu / cesta autem",transport:"auto ~3 200 Kč (benzín+dálniční)",budgetSubtotal:14650,budget:18000,fit:"ok",tags:["moře"],verdict:"v-hot",verdictText:"fotogenické, ale horko",desc:"Nejfotogeničtější istrijské městečko, ceny v sezóně rostou.",tips:["Poloostrov starého města za úsvitu, bez davů","Kajak podél pobřeží k ostrovům Červeného souostroví","Výlet do vnitrozemí za lanýžemi a vínem","Lim fjord na čerstvé ústřice a mušle"]},
+{rank:21,name:"Korfu",country:"Řecko",sub:"moře + hory ostrova",aktivita:4,teplo:4,davy:4,gastro:3,mhd:"Slabá bez auta",drive:null,flight:"yes",flightText:"přímý let",transport:"let ~5 500 Kč (2 osoby, střední cena)",budgetSubtotal:14650,budget:20000,fit:"ok",tags:["moře","hory"],verdict:"v-hot",verdictText:"klasika, moře i hory",desc:"Klasika s mořem i horami, ostrovní ceny v srpnu.",tips:["Treking na horu Pantokrator, nejvyšší bod ostrova","Vesnice vnitrozemí, klidnější než pobřeží","Kajak podél severního pobřeží, tyrkysové zátoky","Olivové háje, ochutnávka oleje přímo od výrobců"]},
+{rank:22,name:"Zadar",country:"Chorvatsko",sub:"mořské varhany, Kornati na skok",aktivita:3,teplo:5,davy:3,gastro:3,mhd:"Průměrná",drive:8,flight:"yes",flightText:"přímý let / cesta autem",transport:"auto ~3 600 Kč (nebo let ~5 000 Kč)",budgetSubtotal:14650,budget:18000,fit:"ok",tags:["moře","mesto"],verdict:"v-hot",verdictText:"mořské varhany, ale horko",desc:"Mořské varhany a Kornati, méně vytížené než jih Dalmácie.",tips:["Mořské varhany a pozorovač slunce, unikátní zvuková instalace","Loď do národního parku Kornati","Plitvická jezera jako celodenní výlet z města","Staré město bez davů typických pro jih Dalmácie"]},
+{rank:23,name:"Neapol",country:"Itálie",sub:"+ Pompeje, Amalfi, Vesuv",aktivita:3,teplo:5,davy:5,gastro:5,mhd:"Průměrná",drive:null,flight:"yes",flightText:"přímý let",transport:"let ~4 500 Kč (2 osoby, střední cena)",budgetSubtotal:11350,budget:16000,fit:"ok",tags:["moře","mesto"],verdict:"v-hot",verdictText:"skvělé jídlo, vedro + davy",desc:"Nejlepší italská kuchyně, ale srpnové vedro a davy to srážejí.",tips:["Vlak Circumvesuviana na výstup na Vesuv","Amalfi na denní výlet, mimo hlavní zastávky","Pravá neapolská pizza mimo centrum, čtvrť Sanità","Ostrov Procida jako klidnější alternativa ke Capri"]},
+{rank:24,name:"Tirana",country:"Albánie",sub:"nejlevnější, blízko Albánských Alp",aktivita:2,teplo:5,davy:2,gastro:2,mhd:"Slabá",drive:null,flight:"yes",flightText:"přímý let",transport:"let ~4 000 Kč (2 osoby, střední cena)",budgetSubtotal:6150,budget:10000,fit:"ok",tags:["mesto"],verdict:"v-caveat",verdictText:"nejlevnější, výheň",desc:"Nejlevnější v žebříčku, ale extrémní srpnové vedro.",tips:["Lanovka Dajti Ekspres na horu nad městem","Blloku district, bývalá komunistická čtvrť plná kaváren","Výlet k jezeru Bovilla v horách kousek od města","Bunk'Art, podzemní bunkr přeměněný na muzeum"]},
+{rank:25,name:"Malta",country:"",sub:"moře, historie, malý ostrov",aktivita:2,teplo:5,davy:5,gastro:3,mhd:"Průměrná",drive:null,flight:"yes",flightText:"přímý let",transport:"let ~5 500 Kč (2 osoby, střední cena)",budgetSubtotal:14650,budget:20000,fit:"ok",tags:["moře"],verdict:"v-hot",verdictText:"nejvíc vedra z ostrovů",desc:"Nejméně aktivní a nejteplejší ostrovní volba v žebříčku.",tips:["Treking podél útesů Dingli Cliffs","Šnorchlování u Modré laguny na Cominu, brzy ráno","Mdina, tiché historické město mimo Vallettu","Loď kolem ostrova Gozo"]},
+{rank:26,name:"Bilbao + San Sebastián",country:"Baskicko, Španělsko",sub:"zelené hory + Atlantik, baskická kuchyně",aktivita:4,teplo:2,davy:2,gastro:5,mhd:"Dobrá",drive:null,flight:"yes",flightText:"přímý let do Bilbaa (sezónní)",transport:"let ~7 500 Kč (2 osoby, střední cena)",budgetSubtotal:14650,budget:22000,fit:"tight",tags:["hory","moře","mesto"],verdict:"v-overbudget",verdictText:"nejlepší gastronomie, přesně na hraně",desc:"Nejvíc michelinských hvězd na hlavu na světě, přesně na stropu.",tips:["Pintxos crawl v San Sebastiánu, baskická gastro klasika","Výstup na horu Urgull nad zátokou La Concha","Guggenheimovo muzeum, procházka podél řeky Nervión","Vesnice Getaria u moře, treking v baskických horách"]},
+{rank:27,name:"Marseille + Calanques",country:"Francie",sub:"útesy nad mořem, francouzská kuchyně",aktivita:4,teplo:5,davy:3,gastro:5,mhd:"Dobrá",drive:null,flight:"yes",flightText:"přímý let",transport:"let ~6 500 Kč (2 osoby, střední cena)",budgetSubtotal:14650,budget:21000,fit:"tight",tags:["moře","hory","mesto"],verdict:"v-overbudget",verdictText:"útesy + moře, na hraně",desc:"Útesy nad mořem, francouzská kuchyně, na hraně rozpočtu.",tips:["Treking nebo kajak v Calanques, útesy nad tyrkysovým mořem","Panier district, staré přístavní čtvrti bez front","Bouillabaisse a mořské plody na tržnici Vieux-Port","Loď na ostrov If nebo do Cassis"]},
+{rank:28,name:"Lyon",country:"Francie",sub:"jedna z gastro špiček Evropy",aktivita:3,teplo:4,davy:3,gastro:5,mhd:"Dobrá",drive:null,flight:"yes",flightText:"přímý let (sezónní)",transport:"let ~7 000 Kč (2 osoby, střední cena)",budgetSubtotal:14650,budget:21500,fit:"tight",tags:["mesto","hory"],verdict:"v-overbudget",verdictText:"gastro špička, na hraně",desc:"Objektivně jedna z nejlepších gastro destinací Evropy, dráž.",tips:["Bouchon lyonnais, tradiční bistra s lokální kuchyní","Čtvrť Croix-Rousse, bývalá tkalcovská čtvrť s výhledy","Výlet do vinařské oblasti Beaujolais, kopce a vinice","Treking v Monts du Lyonnais nebo Parc du Pilat"]},
+{rank:29,name:"Dubrovník",country:"Chorvatsko",sub:"hradby, ostrovy, pobřežní treky",aktivita:3,teplo:5,davy:5,gastro:3,mhd:"Slabá",drive:null,flight:"yes",flightText:"přímý let",transport:"let ~6 000 Kč (2 osoby, střední cena)",budgetSubtotal:14650,budget:20500,fit:"tight",tags:["moře","mesto"],verdict:"v-overbudget",verdictText:"horké, drahé, na hraně",desc:"Nejdražší a nejvytíženější chorvatská volba v srpnu.",tips:["Treking na horu Srđ lanovkou nebo pěšky","Ostrov Lokrum, klidnější alternativa k hradbám","Kajak podél hradeb za úsvitu, mimo špičku","Poloostrov Pelješac, víno a ústřice"]},
+{rank:30,name:"Oslo",country:"Norsko",sub:"fjordy, pěší trasy přímo z města",aktivita:5,teplo:1,davy:3,gastro:4,mhd:"Skvělá",drive:null,flight:"partial",flightText:"let s přestupem",transport:"let ~9 000 Kč (2 osoby, s přestupem)",budgetSubtotal:24500,budget:33500,fit:"over",tags:["hory","mesto","voda"],verdict:"v-overbudget",verdictText:"skvělé, nad rozpočtem",desc:"Kvalitou na špici, ale norské ceny rozpočet neuživí.",tips:["Metro přímo do lesa Nordmarka, jezera a stezky","Kajak ve fjordu přímo z centra města","Čtvrť Grünerløkka, kavárny mimo centrum","Vlak do Holmenkollen, skokanský můstek s výhledem"]},
+{rank:31,name:"Bergen",country:"Norsko",sub:"nejdramatičtější fjordy",aktivita:5,teplo:1,davy:4,gastro:3,mhd:"Dobrá",drive:null,flight:"no",flightText:"bez přímého letu",transport:"let ~10 000 Kč (2 osoby, bez přímého letu)",budgetSubtotal:24500,budget:34500,fit:"over",tags:["hory","mesto","voda"],verdict:"v-overbudget",verdictText:"nejdražší v žebříčku",desc:"Nejdramatičtější příroda, zároveň nejdražší destinace v žebříčku.",tips:["Lanovka Fløyen, treking na hřebeny nad městem","Rybí trh a norské mořské plody u přístavu","Loď po fjordu Nærøyfjord, UNESCO památka","Čtvrť Bryggen za úsvitu, bez turistických davů"]}
+];
+
+const ICONS = {
+  hory: '<svg viewBox="0 0 24 24" fill="none" stroke="#1e4a44" stroke-width="1.6"><path d="M3 19l6-10 4 6 2-3 6 7H3z"/></svg>',
+  moře: '<svg viewBox="0 0 24 24" fill="none" stroke="#2f7896" stroke-width="1.6"><path d="M2 17c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/><path d="M2 12c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/></svg>',
+  voda: '<svg viewBox="0 0 24 24" fill="none" stroke="#2f7896" stroke-width="1.6"><path d="M12 3s6 7 6 11a6 6 0 01-12 0c0-4 6-11 6-11z"/></svg>',
+  mesto: '<svg viewBox="0 0 24 24" fill="none" stroke="#7a4a6b" stroke-width="1.6"><path d="M4 21V9l5-4 5 4v12M14 21v-8l6-3v11"/><path d="M7 12h1M7 16h1M11 12h1M11 16h1"/></svg>',
+  cyklo: '<svg viewBox="0 0 24 24" fill="none" stroke="#c07f2b" stroke-width="1.6"><circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M6 17l4-8h4l4 8M10 9h4"/></svg>'
+};
+
+const cardsEl = document.getElementById('cards');
+const countEl = document.getElementById('count');
+let activeTag = 'vse';
+let activeBudget = 'vse';
+let activeHeat = 'vse';
+let quickFilter = null;
+
+function gaugeDots(value, cls){
+  let html = '<div class="dots">';
+  for(let i=1;i<=5;i++){
+    html += `<div class="dot ${i<=value?cls:''}"></div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+function fitPill(fit){
+  if(fit==='ok') return `<span class="fitpill fit-ok">vejde se</span>`;
+  if(fit==='tight') return `<span class="fitpill fit-tight">na hraně</span>`;
+  return `<span class="fitpill fit-over">nad rozpočtem</span>`;
+}
+
+function iconsFor(tags){
+  return tags.map(t=>ICONS[t]||'').join('');
+}
+
+function cmp(key, a, b){
+  if(key==='cena') return a.budget-b.budget;
+  if(key==='teplo') return a.teplo-b.teplo;
+  if(key==='aktivita') return b.aktivita-a.aktivita;
+  if(key==='gastro') return b.gastro-a.gastro;
+  if(key==='davy') return a.davy-b.davy;
+  if(key==='drive') return (a.drive===null?999:a.drive)-(b.drive===null?999:b.drive);
+  return a.rank-b.rank;
+}
+
+function render(){
+  let list = [...data];
+
+  if(quickFilter === 'jidlo') list = list.filter(d=>d.gastro>=4);
+  if(quickFilter === 'auto') list = list.filter(d=>d.drive!==null && d.drive<=10);
+  if(quickFilter === 'original') list = list.filter(d=>d.davy<=2);
+  if(quickFilter === 'mestohory') list = list.filter(d=>d.tags.includes('hory') && d.tags.includes('mesto'));
+
+  if(activeTag !== 'vse') list = list.filter(d=>d.tags.includes(activeTag));
+
+  if(activeBudget !== 'vse'){
+    const cap = parseInt(activeBudget,10)*1000;
+    list = list.filter(d=>d.budget<=cap);
+  }
+
+  if(activeHeat === 'chlad') list = list.filter(d=>d.teplo<=2);
+  if(activeHeat === 'mirne') list = list.filter(d=>d.teplo===3);
+  if(activeHeat === 'horko') list = list.filter(d=>d.teplo>=4);
+
+  const p = document.getElementById('sortPrimary').value;
+  const s = document.getElementById('sortSecondary').value;
+  list.sort((a,b)=>{
+    const primary = cmp(p,a,b);
+    if(primary!==0) return primary;
+    if(s!=='none') return cmp(s,a,b);
+    return a.rank-b.rank;
+  });
+
+  countEl.textContent = `${list.length} z 31 destinací`;
+
+  if(list.length===0){
+    cardsEl.innerHTML = `<div style="padding:30px 4px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8a7f63;">Žádná destinace nesplňuje tuhle kombinaci filtrů. Zkus jich pár uvolnit.</div>`;
+    return;
+  }
+
+  cardsEl.innerHTML = list.map(d => `
+    <div class="card ${d.fit==='over'?'overbudget':''}">
+      <div class="icons">${iconsFor(d.tags)}</div>
+      <div class="card-top">
+        <div>
+          <div class="rank">#${d.rank} v žebříčku</div>
+          <div class="name">${d.name}${d.country?` <span style="font-weight:400;font-size:12.5px;color:#8a7f63;">· ${d.country}</span>`:''}</div>
+          <div class="sub">${d.sub}</div>
+        </div>
+        <div class="verdict ${d.verdict}">${d.verdictText}</div>
+      </div>
+      <div class="desc">${d.desc}</div>
+      <div class="budgetline">
+        <div class="budgetline-top">
+          <span class="amount">~${d.budget.toLocaleString('cs-CZ')} Kč / 2 os., 5 dní</span>
+          ${fitPill(d.fit)}
+        </div>
+        <div class="breakdown">byt+strava ~${d.budgetSubtotal.toLocaleString('cs-CZ')} Kč · doprava: ${d.transport}</div>
+      </div>
+      <div class="gauges">
+        <div><div class="gauge-label">Aktivita</div>${gaugeDots(d.aktivita,'on-act')}</div>
+        <div><div class="gauge-label">Vedro (srpen, průměr)</div>${gaugeDots(d.teplo,'on-heat')}</div>
+        <div><div class="gauge-label">Turisté</div>${gaugeDots(d.davy,'on-crowd')}</div>
+        <div><div class="gauge-label">Gastronomie</div>${gaugeDots(d.gastro,'on-food')}</div>
+      </div>
+      <div class="meta">
+        <span class="meta-badge">MHD: ${d.mhd}</span>
+        ${d.drive!==null?`<span class="meta-badge drive">autem z Olomouce ~${d.drive} h</span>`:''}
+      </div>
+      <ul class="tips">
+        ${d.tips.map(t=>`<li>${t}</li>`).join('')}
+      </ul>
+      <div class="tags">
+        ${d.tags.map(t=>`<span class="tag">${t}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+document.querySelectorAll('.dbtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const f = btn.dataset.filter;
+    if(quickFilter === f){ quickFilter = null; btn.classList.remove('active'); }
+    else { document.querySelectorAll('.dbtn').forEach(b=>b.classList.remove('active')); quickFilter = f; btn.classList.add('active'); }
+    render();
+  });
+});
+
+document.querySelectorAll('#tagFilters .chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    document.querySelectorAll('#tagFilters .chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    activeTag = chip.dataset.tag;
+    render();
+  });
+});
+
+document.querySelectorAll('#budgetFilters .chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    document.querySelectorAll('#budgetFilters .chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    activeBudget = chip.dataset.budget;
+    render();
+  });
+});
+
+document.querySelectorAll('#heatFilters .chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    document.querySelectorAll('#heatFilters .chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    activeHeat = chip.dataset.heat;
+    render();
+  });
+});
+
+document.getElementById('sortPrimary').addEventListener('change', render);
+document.getElementById('sortSecondary').addEventListener('change', render);
+
+render();
+</script>
+
+</body>
+</html>
